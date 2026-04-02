@@ -1,15 +1,13 @@
 services:
-  social-media-planner:
+  nora:
     build: .
-    container_name: social-media-planner
+    container_name: nora-social-planner
     ports:
-      - "3005:3000"
+      - "3001:3001"
     environment:
-      PORT: 3000
+      PORT: 3001
       DB_PATH: /app/data/planner.db
-      ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: bitte-sofort-aendern-123
-      SESSION_DAYS: 14
+      SECRET_KEY: change-this-in-portainer
     volumes:
       - ./data:/app/data
     restart: unless-stopped
