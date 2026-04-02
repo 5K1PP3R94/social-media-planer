@@ -17,6 +17,101 @@ const channelClasses = {
   facebook: 'fb', instagram: 'ig', linkedin: 'li', tiktok: 'tt', website: 'web',
 };
 
+
+const BRAND_DEFAULTS = {
+  accent: '#664393',
+  accent2: '#cf4492',
+  background: '#191631',
+};
+
+function hexToRgb(hex) {
+  const value = hex.replace('#', '');
+  const normalized = value.length === 3 ? value.split('').map((ch) => ch + ch).join('') : value;
+  const int = Number.parseInt(normalized, 16);
+  return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+}
+function rgbToHex({ r, g, b }) {
+  const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+  return `#${[clamp(r), clamp(g), clamp(b)].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+function mix(hexA, hexB, ratio) {
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  return rgbToHex({
+    r: a.r + (b.r - a.r) * ratio,
+    g: a.g + (b.g - a.g) * ratio,
+    b: a.b + (b.b - a.b) * ratio,
+  });
+}
+function rgbString(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  return `${r}, ${g}, ${b}`;
+}
+function setBrandTheme(accent, accent2) {
+  const root = document.documentElement;
+  root.style.setProperty('--accent', accent);
+  root.style.setProperty('--accent-2', accent2);
+  root.style.setProperty('--accent-rgb', rgbString(accent));
+  root.style.setProperty('--accent-2-rgb', rgbString(accent2));
+  root.style.setProperty('--bg-2', mix(BRAND_DEFAULTS.background, accent, 0.18));
+  root.style.setProperty('--panel', `color-mix(in srgb, ${BRAND_DEFAULTS.background} 84%, ${accent} 16%)`);
+  root.style.setProperty('--panel-strong', `color-mix(in srgb, ${BRAND_DEFAULTS.background} 74%, ${accent2} 26%)`);
+}
+
+function extractBrandColorsFromImage(img) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return null;
+  const sampleWidth = 180;
+  const ratio = img.naturalWidth / img.naturalHeight || 1;
+  canvas.width = sampleWidth;
+  canvas.height = Math.max(40, Math.round(sampleWidth / ratio));
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const buckets = new Map();
+
+  for (let i = 0; i < data.length; i += 4) {
+    const alpha = data[i + 3];
+    if (alpha < 16) continue;
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const saturation = max === 0 ? 0 : (max - min) / max;
+    const brightness = (r + g + b) / 3;
+    if (saturation < 0.22 || brightness > 245 || brightness < 30) continue;
+    const key = `${Math.round(r / 12) * 12},${Math.round(g / 12) * 12},${Math.round(b / 12) * 12}`;
+    const current = buckets.get(key) || 0;
+    buckets.set(key, current + saturation * 3 + (255 - Math.abs(168 - brightness)) / 255);
+  }
+
+  const colors = Array.from(buckets.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([key]) => {
+      const [r, g, b] = key.split(',').map(Number);
+      return rgbToHex({ r, g, b });
+    });
+
+  if (!colors.length) return null;
+  const accent = colors[0];
+  let accent2 = colors.find((color) => Math.abs(hexToRgb(color).r - hexToRgb(accent).r) + Math.abs(hexToRgb(color).b - hexToRgb(accent).b) > 60);
+  accent2 = accent2 || BRAND_DEFAULTS.accent2;
+  return { accent, accent2 };
+}
+
+function initBrandTheme() {
+  setBrandTheme(BRAND_DEFAULTS.accent, BRAND_DEFAULTS.accent2);
+  const logo = document.getElementById('brand-logo');
+  if (!logo) return;
+  const apply = () => {
+    const extracted = extractBrandColorsFromImage(logo);
+    if (extracted) setBrandTheme(extracted.accent, extracted.accent2);
+  };
+  if (logo.complete) apply();
+  else logo.addEventListener('load', apply, { once: true });
+}
+
 const els = {
   shell: document.querySelector('.shell'),
   navLinks: document.querySelectorAll('.nav-link'),
@@ -351,5 +446,6 @@ function bindEvents() {
   els.createUserForm?.addEventListener('submit', submitCreateUser);
 }
 
+initBrandTheme();
 bindEvents();
 requireSession().catch((error) => showMessage(error.message, 'error'));

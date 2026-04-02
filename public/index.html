@@ -3,851 +3,162 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Social Media Planner – 3 Ansichten</title>
-  <style>
-    :root {
-      --bg: #191631;
-      --bg-2: #0d1a2f;
-      --panel: rgba(14, 24, 45, 0.78);
-      --panel-strong: rgba(17, 29, 52, 0.95);
-      --line: rgba(255, 255, 255, 0.08);
-      --text: #ecf2ff;
-      --muted: #9fb0d1;
-      --accent: #664393;
-      --accent-2: #cf4492;
-      --accent-3: #f59e0b;
-      --good: #22c55e;
-      --idea: #38bdf8;
-      --work: #f59e0b;
-      --planned: #22c55e;
-      --published: #a78bfa;
-      --danger: #fb7185;
-      --shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.28), transparent 28%),
-        radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.16), transparent 30%),
-        radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.10), transparent 26%),
-        linear-gradient(155deg, #060b15 0%, #091224 45%, #0d1730 100%);
-    }
-
-    .shell {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 290px 1fr;
-    }
-
-    .sidebar {
-      padding: 24px 20px;
-      border-right: 1px solid var(--line);
-      background: rgba(6, 10, 20, 0.58);
-      backdrop-filter: blur(18px);
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      box-shadow: 0 15px 30px rgba(124, 58, 237, 0.35);
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 1.05rem;
-    }
-
-    .brand p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    .nav {
-      display: grid;
-      gap: 10px;
-    }
-
-    .nav a {
-      text-decoration: none;
-      color: var(--text);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 15px 16px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid transparent;
-      transition: 0.2s ease;
-    }
-
-    .nav a:hover,
-    .nav a.active {
-      background: linear-gradient(135deg, rgba(124,58,237,0.24), rgba(6,182,212,0.16));
-      border-color: rgba(255,255,255,0.08);
-      transform: translateX(2px);
-    }
-
-    .nav .meta {
-      color: var(--muted);
-      font-size: 0.8rem;
-      white-space: nowrap;
-    }
-
-    .quick-card {
-      margin-top: auto;
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(160deg, rgba(124,58,237,0.20), rgba(6,182,212,0.15));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: var(--shadow);
-    }
-
-    .quick-card h3 {
-      margin: 0 0 10px;
-      font-size: 1rem;
-    }
-
-    .quick-card p {
-      margin: 0;
-      color: #d8e1fb;
-      font-size: 0.92rem;
-      line-height: 1.5;
-    }
-
-    .main {
-      padding: 28px;
-      display: grid;
-      gap: 24px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .topbar h2 {
-      margin: 0;
-      font-size: 2rem;
-      line-height: 1.08;
-    }
-
-    .topbar p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      max-width: 60ch;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 16px;
-      padding: 13px 18px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .btn-primary {
-      color: white;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.35);
-    }
-
-    .btn-secondary {
-      color: var(--text);
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-    }
-
-    .hero {
-      padding: 28px;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 22px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      right: -60px;
-      bottom: -60px;
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(124,58,237,0.22), transparent 68%);
-      pointer-events: none;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #cad5fb;
-      font-size: 0.85rem;
-      margin-bottom: 18px;
-    }
-
-    .hero h3 {
-      margin: 0 0 10px;
-      font-size: clamp(1.8rem, 3vw, 3rem);
-      line-height: 1.05;
-    }
-
-    .hero p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.58;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      align-content: start;
-    }
-
-    .stat {
-      padding: 18px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .stat .label {
-      color: var(--muted);
-      font-size: 0.84rem;
-    }
-
-    .stat .value {
-      margin-top: 6px;
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
-
-    .stat .sub {
-      margin-top: 6px;
-      color: #d3ddfd;
-      font-size: 0.86rem;
-    }
-
-    .page {
-      display: none;
-      gap: 22px;
-    }
-
-    .page.active {
-      display: grid;
-    }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-    }
-
-    .section-head h4 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-
-    .section-head p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .pill {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: var(--text);
-      font-size: 0.86rem;
-      font-weight: 700;
-    }
-
-    .planner-grid {
-      display: grid;
-      grid-template-columns: 1.3fr 0.7fr;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .planner-table,
-    .planner-side,
-    .idea-main,
-    .overview-main {
-      padding: 22px;
-    }
-
-    .rows {
-      display: grid;
-      gap: 12px;
-    }
-
-    .row-head,
-    .row {
-      display: grid;
-      grid-template-columns: 72px 88px 1.8fr 120px 120px 170px 120px;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .row-head {
-      color: var(--muted);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0 8px 4px;
-    }
-
-    .row {
-      padding: 16px 18px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .day-chip {
-      display: inline-flex;
-      width: fit-content;
-      justify-content: center;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(124,58,237,0.28), rgba(6,182,212,0.16));
-      font-weight: 800;
-    }
-
-    .title {
-      font-weight: 800;
-    }
-
-    .muted { color: var(--muted); }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .badge {
-      padding: 7px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .fb { background: rgba(59,130,246,0.18); color: #bfdbfe; }
-    .ig { background: rgba(236,72,153,0.18); color: #fbcfe8; }
-    .li { background: rgba(6,182,212,0.18); color: #bae6fd; }
-    .tt { background: rgba(148,163,184,0.18); color: #e2e8f0; }
-    .web { background: rgba(139,92,246,0.18); color: #ddd6fe; }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 900;
-      border: 1px solid transparent;
-    }
-
-    .status.idea { background: rgba(56,189,248,0.16); color: #bae6fd; border-color: rgba(56,189,248,0.24); }
-    .status.work { background: rgba(245,158,11,0.16); color: #fde68a; border-color: rgba(245,158,11,0.24); }
-    .status.planned { background: rgba(34,197,94,0.16); color: #bbf7d0; border-color: rgba(34,197,94,0.24); }
-    .status.published { background: rgba(167,139,250,0.16); color: #ddd6fe; border-color: rgba(167,139,250,0.24); }
-
-    .side-stack {
-      display: grid;
-      gap: 18px;
-    }
-
-    .mini-card {
-      padding: 18px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .mini-card h5 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-
-    .mini-card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 0.92rem;
-    }
-
-    .mini-list {
-      margin-top: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .mini-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.05);
-      font-size: 0.9rem;
-    }
-
-    .idea-layout {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .idea-input {
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(160deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08));
-      border: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 18px;
-    }
-
-    .input-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.9fr 0.7fr auto;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .field {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 14px 16px;
-      outline: none;
-      font: inherit;
-    }
-
-    .idea-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .idea-card {
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
-      border: 1px solid rgba(255,255,255,0.06);
-      display: grid;
-      gap: 16px;
-      min-height: 180px;
-    }
-
-    .idea-card h5 {
-      margin: 0;
-      font-size: 1.05rem;
-    }
-
-    .idea-card p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 0.92rem;
-    }
-
-    .card-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .ghost-btn {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.05);
-      color: white;
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .ghost-btn:hover { background: rgba(255,255,255,0.08); }
-
-    .overview-layout {
-      display: grid;
-      gap: 22px;
-    }
-
-    .overview-toolbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .overview-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .compact-row {
-      display: grid;
-      grid-template-columns: 72px minmax(180px, 1.5fr) 120px 120px 140px 92px;
-      gap: 12px;
-      align-items: center;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .compact-row.head {
-      color: var(--muted);
-      background: transparent;
-      border: 0;
-      padding: 0 8px 2px;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .compact-date { font-weight: 900; color: #c7d2fe; }
-    .compact-name { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .compact-channels { color: var(--muted); font-size: 0.82rem; font-weight: 800; letter-spacing: 0.04em; }
-
-    @media (max-width: 1320px) {
-      .planner-grid,
-      .idea-layout,
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .idea-cards {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 1120px) {
-      .shell {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: relative;
-        height: auto;
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .row,
-      .row-head {
-        grid-template-columns: 64px 80px 1.4fr 110px 110px 160px 110px;
-      }
-
-      .compact-row {
-        grid-template-columns: 72px 1.5fr 110px 110px 130px 92px;
-      }
-
-      .input-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 860px) {
-      .main { padding: 18px; }
-
-      .row-head,
-      .compact-row.head {
-        display: none;
-      }
-
-      .row,
-      .compact-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .input-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <title>NØRA – Control the Chaos</title>
+  <meta name="theme-color" content="#191631" />
+  <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/favicon.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="ambient ambient-c"></div>
+
   <div class="shell">
     <aside class="sidebar">
       <div class="brand">
-        <img src="/logo.png" alt="NORA Logo" style="width:52px;height:52px;object-fit:contain;" />
+        <div class="brand-mark glow-target">
+          <img id="brand-logo" src="/logo.png" alt="NØRA Logo" />
+        </div>
         <div>
           <h1>NØRA</h1>
-          <p>drei Ansichten, null Excel-Wehmut</p>
+          <p>CONTROL THE CHAOS</p>
         </div>
       </div>
 
       <nav class="nav">
-        <a href="#planer" class="nav-link active" data-page="planer">
+        <a href="#" class="nav-link active glow-target" data-page="planer">
           <span>📅 Planer</span>
-          <span class="meta">18 Posts</span>
+          <span class="meta" id="nav-planner-count">0 Posts</span>
         </a>
-        <a href="#ideen" class="nav-link" data-page="ideen">
+        <a href="#" class="nav-link glow-target" data-page="ideen">
           <span>💡 Ideensammlung</span>
-          <span class="meta">12 Ideen</span>
+          <span class="meta" id="nav-idea-count">0 Ideen</span>
         </a>
-        <a href="#uebersicht" class="nav-link" data-page="uebersicht">
+        <a href="#" class="nav-link glow-target" data-page="uebersicht">
           <span>📋 Planübersicht</span>
           <span class="meta">kompakt</span>
         </a>
       </nav>
 
-      <div class="quick-card">
-        <h3>Workflow sitzt</h3>
-        <p>Idee rein, in den Planer schieben, in der Übersicht blitzschnell alles erfassen. Genau so soll das Ding arbeiten.</p>
+      <div class="quick-card glow-target">
+        <span class="section-kicker">Brand Flow</span>
+        <h3>Von Idee bis Überblick</h3>
+        <p>Inbox rein. Planer rüber. Übersicht checken. Kein Excel-Gefängnis, nur sauberer Content-Flow mit NØRA-Vibes.</p>
       </div>
     </aside>
 
     <main class="main">
-      <header class="topbar">
+      <header class="topbar panel glow-target">
         <div>
-          <h2>Social Media Planner</h2>
-          <p>Eine moderne Oberfläche mit drei klar getrennten Modi: sammeln, bearbeiten und den kompletten Plan in einem Blick erfassen.</p>
+          <span class="section-kicker">NØRA Workspace</span>
+          <h2>Social Media Planung mit Marken-DNA.</h2>
+          <p>Deine drei Modi bleiben klar getrennt: sammeln, verarbeiten, Überblick halten. Jetzt komplett im NØRA-Branding statt in freundlich depressivem Tabellenbeige.</p>
         </div>
         <div class="actions">
-          <button class="btn btn-secondary">Import</button>
-          <button class="btn btn-primary">+ Neuer Inhalt</button>
+          <div class="account-chip" id="account-chip">Nicht angemeldet</div>
+          <button class="btn btn-secondary glow-target" id="account-btn">Account</button>
+          <button class="btn btn-secondary glow-target" id="refresh-btn">Neu laden</button>
+          <button class="btn btn-primary glow-target" data-page-jump="ideen">+ Neuer Inhalt</button>
         </div>
       </header>
 
-      <section class="panel hero">
-        <div>
-          <div class="eyebrow">✨ UI-Prototyp mit echter Seitenlogik</div>
-          <h3>Ein Tool statt<br />Excel-Bastelaltar.</h3>
-          <p>Die drei Ansichten sind jetzt sauber voneinander getrennt. Der Planer ist deine Arbeitsfläche, die Ideensammlung dein kreativer Eingangskorb und die Planübersicht dein Radar für alles, was bereits fixiert wurde.</p>
+      <section class="hero panel glow-target">
+        <div class="hero-copy">
+          <span class="eyebrow">✨ NØRA Brand Mode aktiviert</span>
+          <h3>Control the Chaos.<br />Plan the signal.</h3>
+          <p>Ideensammlung, Planer und Übersicht greifen auf dieselbe Datenbank zu. Ein Post wandert sauber zwischen den Zuständen – ohne Duplikat-Müll, ohne Excel-Drama, ohne „wo war das jetzt nochmal?".</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary glow-target" data-page-jump="planer">Zum Planer</button>
+            <button class="btn btn-secondary glow-target" data-page-jump="ideen">Ideen ansehen</button>
+          </div>
         </div>
         <div class="stats">
-          <div class="stat">
+          <div class="stat glow-target">
             <div class="label">Geplant</div>
-            <div class="value">18</div>
-            <div class="sub">April bis Juni</div>
+            <div class="value" id="stat-planner">0</div>
+            <div class="sub">fix im Planer</div>
           </div>
-          <div class="stat">
+          <div class="stat glow-target">
             <div class="label">Ideenpool</div>
-            <div class="value">12</div>
-            <div class="sub">wartet aufs Einplanen</div>
+            <div class="value" id="stat-ideas">0</div>
+            <div class="sub">wartet auf Timing</div>
           </div>
-          <div class="stat">
+          <div class="stat glow-target">
             <div class="label">In Arbeit</div>
-            <div class="value">7</div>
-            <div class="sub">mit sanftem Panikschimmer</div>
+            <div class="value" id="stat-progress">0</div>
+            <div class="sub">mit gesundem Druck</div>
           </div>
-          <div class="stat">
+          <div class="stat glow-target">
             <div class="label">Kanäle</div>
-            <div class="value">5</div>
-            <div class="sub">FB, IG, LI, TT, WEB</div>
+            <div class="value" id="stat-channels">5</div>
+            <div class="sub">FB · IG · LI · TT · WEB</div>
           </div>
         </div>
       </section>
 
+      <section id="message-area"></section>
+
       <section id="planer" class="page active">
         <div class="planner-grid">
-          <div class="panel planner-table">
+          <div class="panel planner-table glow-target">
             <div class="section-head">
               <div>
+                <span class="section-kicker">Operations</span>
                 <h4>Planer</h4>
-                <p>Die große Arbeitsansicht mit allen Details, Status und Kanalzuweisung.</p>
+                <p>Die große Arbeitsansicht mit Datum, Status, Kanalset und Bearbeitung direkt im Flow.</p>
               </div>
               <div class="toolbar">
-                <div class="pill">Tabelle</div>
-                <div class="pill">Woche</div>
-                <div class="pill">Monat</div>
+                <div class="pill glow-target">Tabelle</div>
+                <div class="pill glow-target">Woche später</div>
+                <div class="pill glow-target">Monat später</div>
               </div>
             </div>
-
-            <div class="rows">
-              <div class="row-head">
-                <div>Tag</div>
-                <div>Datum</div>
-                <div>Content</div>
-                <div>Kategorie</div>
-                <div>Art</div>
-                <div>Kanäle</div>
-                <div>Status</div>
-              </div>
-
-              <div class="row">
-                <div><span class="day-chip">Mo</span></div>
-                <div>13.04.</div>
-                <div class="title">Ausstellung Detailpost</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="badges">
-                  <span class="badge fb">FB</span>
-                  <span class="badge ig">IG</span>
-                  <span class="badge li">LI</span>
-                </div>
-                <div><span class="status work">In Arbeit</span></div>
-              </div>
-
-              <div class="row">
-                <div><span class="day-chip">Mi</span></div>
-                <div>15.04.</div>
-                <div class="title">Ende Winterreifenpflicht</div>
-                <div class="muted">Service</div>
-                <div class="muted">Grafik</div>
-                <div class="badges">
-                  <span class="badge fb">FB</span>
-                  <span class="badge ig">IG</span>
-                  <span class="badge li">LI</span>
-                </div>
-                <div><span class="status work">In Arbeit</span></div>
-              </div>
-
-              <div class="row">
-                <div><span class="day-chip">Fr</span></div>
-                <div>17.04.</div>
-                <div class="title">Morgen geht’s los (Ausstellung)</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="badges">
-                  <span class="badge fb">FB</span>
-                  <span class="badge ig">IG</span>
-                  <span class="badge li">LI</span>
-                </div>
-                <div><span class="status planned">Geplant</span></div>
-              </div>
-
-              <div class="row">
-                <div><span class="day-chip">Di</span></div>
-                <div>21.04.</div>
-                <div class="title">Nachbericht (Ausstellung)</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="badges">
-                  <span class="badge fb">FB</span>
-                  <span class="badge ig">IG</span>
-                  <span class="badge li">LI</span>
-                </div>
-                <div><span class="status work">In Arbeit</span></div>
-              </div>
-
-              <div class="row">
-                <div><span class="day-chip">Mi</span></div>
-                <div>22.04.</div>
-                <div class="title">Earth Day?</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="badges">
-                  <span class="badge fb">FB</span>
-                  <span class="badge ig">IG</span>
-                  <span class="badge li">LI</span>
-                </div>
-                <div><span class="status idea">Idee</span></div>
-              </div>
-            </div>
+            <div class="rows" id="planner-rows"></div>
           </div>
 
           <div class="side-stack">
-            <div class="panel planner-side">
+            <div class="panel planner-side glow-target">
               <div class="section-head">
                 <div>
-                  <h4>Nächste Schritte</h4>
-                  <p>Schneller Fokus auf das, was bald dran ist.</p>
+                  <span class="section-kicker">Quick Action</span>
+                  <h4>Idee schnell einplanen</h4>
+                  <p>Eine Idee auswählen, Datum rein, ab dafür.</p>
                 </div>
               </div>
-              <div class="mini-list">
-                <div class="mini-item"><span>17.04. Ausstellung Start</span><span class="status planned">Fix</span></div>
-                <div class="mini-item"><span>22.04. Earth Day finalisieren</span><span class="status idea">Offen</span></div>
-                <div class="mini-item"><span>28.04. Dachbox Reel drehen</span><span class="status work">Läuft</span></div>
-              </div>
+              <form class="mini-card quick-plan-card" id="quick-plan-form">
+                <label class="stack-label">Idee
+                  <select class="field" name="postId" id="quick-plan-select"></select>
+                </label>
+                <label class="stack-label">Datum
+                  <input class="field" type="date" name="planned_date" required />
+                </label>
+                <label class="stack-label">Status
+                  <select class="field" name="status">
+                    <option value="planned">Geplant</option>
+                    <option value="in_progress">In Arbeit</option>
+                    <option value="idea">Idee</option>
+                  </select>
+                </label>
+                <label class="stack-label">Kanäle
+                  <div class="channel-options">
+                    <label><input type="checkbox" name="channels" value="facebook" checked /> FB</label>
+                    <label><input type="checkbox" name="channels" value="instagram" checked /> IG</label>
+                    <label><input type="checkbox" name="channels" value="linkedin" checked /> LI</label>
+                    <label><input type="checkbox" name="channels" value="tiktok" /> TT</label>
+                    <label><input type="checkbox" name="channels" value="website" /> WEB</label>
+                  </div>
+                </label>
+                <button class="btn btn-primary glow-target" type="submit">In Planer schieben</button>
+              </form>
             </div>
 
-            <div class="panel planner-side">
-              <div class="section-head">
-                <div>
-                  <h4>Planer-Notiz</h4>
-                  <p>Detailgrad hoch, aber optisch sauber. Genau hier passiert die eigentliche Arbeit.</p>
-                </div>
-              </div>
+            <div class="panel planner-side glow-target">
               <div class="mini-card">
-                <h5>Warum diese Ansicht?</h5>
-                <p>Weil du hier mit Datum, Status, Kategorie und Kanal wirklich arbeiten kannst, ohne dass es aussieht wie eine Steuererklärung aus Mordor.</p>
+                <span class="section-kicker">Radar</span>
+                <h5>Nächste Schritte</h5>
+                <div class="mini-list" id="next-steps"></div>
               </div>
             </div>
           </div>
@@ -856,94 +167,38 @@
 
       <section id="ideen" class="page">
         <div class="idea-layout">
-          <div class="panel idea-main">
+          <div class="panel idea-main glow-target">
             <div class="section-head">
               <div>
+                <span class="section-kicker">Inbox</span>
                 <h4>Ideensammlung</h4>
-                <p>Hier landen rohe Ideen. Noch kein Datum, noch kein Stress, nur guter Stoff.</p>
-              </div>
-              <div class="toolbar">
-                <div class="pill">Offen</div>
-                <div class="pill">Service</div>
-                <div class="pill">Reels</div>
+                <p>Rohe Ideen. Noch kein Datum, noch kein Produktionsstress. Einfach Stoff einsammeln.</p>
               </div>
             </div>
 
-            <div class="idea-input">
+            <form class="idea-input glow-target" id="idea-form">
               <strong>Neue Idee erfassen</strong>
               <div class="input-grid">
-                <input class="field" value="Zum Beispiel: Sommercheck Klimaanlage" />
-                <select class="field"><option>Kategorie wählen</option></select>
-                <select class="field"><option>Art wählen</option></select>
-                <button class="btn btn-primary">Speichern</button>
+                <input class="field" name="title" placeholder="Zum Beispiel: Sommercheck Klimaanlage" required />
+                <input class="field" name="category" placeholder="Kategorie" />
+                <input class="field" name="content_type" placeholder="Art" />
+                <button class="btn btn-primary glow-target" type="submit">Speichern</button>
               </div>
-            </div>
+              <div class="input-grid full-width-grid">
+                <textarea class="field text-area" name="description" placeholder="Kurze Beschreibung oder Gedanken zur Idee"></textarea>
+              </div>
+            </form>
 
-            <div class="idea-cards">
-              <article class="idea-card">
-                <div>
-                  <h5>Star Wars Day?</h5>
-                  <p>Humorvoller Autohaus-Post mit Sci-Fi-Anspielung. Könnte als Reel oder Grafik funktionieren.</p>
-                </div>
-                <div class="card-actions">
-                  <div class="badges">
-                    <span class="badge">Verkauf</span>
-                    <span class="badge">Reel</span>
-                  </div>
-                  <button class="ghost-btn">In Planer</button>
-                </div>
-              </article>
-
-              <article class="idea-card">
-                <div>
-                  <h5>Urlaubscheck Wischerblätter</h5>
-                  <p>Kurzer saisonaler Hinweis vor Reisebeginn. Nützlich, sympathisch und schnell produziert.</p>
-                </div>
-                <div class="card-actions">
-                  <div class="badges">
-                    <span class="badge">Service</span>
-                    <span class="badge">Reel</span>
-                  </div>
-                  <button class="ghost-btn">In Planer</button>
-                </div>
-              </article>
-
-              <article class="idea-card">
-                <div>
-                  <h5>Angebot der Woche</h5>
-                  <p>Flexibles Format für spontane Aktionen. Ideal als Animation oder grafischer Schnellpost.</p>
-                </div>
-                <div class="card-actions">
-                  <div class="badges">
-                    <span class="badge">DWA</span>
-                    <span class="badge">Animation</span>
-                  </div>
-                  <button class="ghost-btn">In Planer</button>
-                </div>
-              </article>
-
-              <article class="idea-card">
-                <div>
-                  <h5>Muttertag</h5>
-                  <p>Wertschätzender Mitarbeiter- oder Familienbezug. Kann sympathisch und nahbar wirken.</p>
-                </div>
-                <div class="card-actions">
-                  <div class="badges">
-                    <span class="badge">Mitarbeiter</span>
-                    <span class="badge">Grafik</span>
-                  </div>
-                  <button class="ghost-btn">In Planer</button>
-                </div>
-              </article>
-            </div>
+            <div class="idea-cards" id="idea-cards"></div>
           </div>
 
           <div class="side-stack">
-            <div class="panel planner-side">
+            <div class="panel planner-side glow-target">
               <div class="section-head">
                 <div>
+                  <span class="section-kicker">Rules</span>
                   <h4>Ideen-Regeln</h4>
-                  <p>Diese Ansicht soll bewusst leicht und schnell bleiben.</p>
+                  <p>Leicht, schnell, ohne Overengineering.</p>
                 </div>
               </div>
               <div class="mini-list">
@@ -952,139 +207,161 @@
                 <div class="mini-item"><span>Ein Klick in den Planer</span><span>✓</span></div>
               </div>
             </div>
-
-            <div class="panel planner-side">
-              <div class="mini-card">
-                <h5>Später sinnvoll</h5>
-                <p>Suche, Tags, Priorität, vielleicht sogar AI-Ideenhilfe. Aber erst mal muss das Grundgefühl stimmen – und das tut’s hier.</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       <section id="uebersicht" class="page">
         <div class="overview-layout">
-          <div class="panel overview-main">
+          <div class="panel overview-main glow-target">
             <div class="section-head">
               <div>
+                <span class="section-kicker">Snapshot</span>
                 <h4>Planübersicht</h4>
-                <p>Maximal kompakt. Möglichst viel sehen, möglichst wenig ablenkender Kram.</p>
+                <p>Maximal kompakt. Möglichst viel sehen, möglichst wenig Krach.</p>
               </div>
             </div>
-
-            <div class="overview-toolbar">
-              <div class="toolbar">
-                <div class="pill">Alle Kanäle</div>
-                <div class="pill">April–Juni</div>
-                <div class="pill">nur geplant</div>
-              </div>
-              <div class="pill">Sortiert nach Datum</div>
-            </div>
-
-            <div class="overview-list">
-              <div class="compact-row head">
-                <div>Datum</div>
-                <div>Titel</div>
-                <div>Kategorie</div>
-                <div>Art</div>
-                <div>Kanäle</div>
-                <div>Status</div>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">13.04</div>
-                <div class="compact-name">Ausstellung Detailpost</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status work">Arbeit</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">15.04</div>
-                <div class="compact-name">Ende Winterreifenpflicht</div>
-                <div class="muted">Service</div>
-                <div class="muted">Grafik</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status work">Arbeit</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">17.04</div>
-                <div class="compact-name">Morgen geht’s los (Ausstellung)</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status planned">Geplant</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">21.04</div>
-                <div class="compact-name">Nachbericht Ausstellung</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status work">Arbeit</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">22.04</div>
-                <div class="compact-name">Earth Day</div>
-                <div class="muted">Allgemein</div>
-                <div class="muted">Reel</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status idea">Idee</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">28.04</div>
-                <div class="compact-name">Dachbox Mieten/Kaufen</div>
-                <div class="muted">Verkauf</div>
-                <div class="muted">Reel</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status planned">Geplant</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">01.05</div>
-                <div class="compact-name">Kundenbewertung</div>
-                <div class="muted">Redaktionell</div>
-                <div class="muted">Animation</div>
-                <div class="compact-channels">FB IG LI</div>
-                <span class="status work">Arbeit</span>
-              </div>
-
-              <div class="compact-row">
-                <div class="compact-date">10.05</div>
-                <div class="compact-name">Muttertag</div>
-                <div class="muted">Mitarbeiter</div>
-                <div class="muted">Grafik</div>
-                <div class="compact-channels">FB IG</div>
-                <span class="status work">Arbeit</span>
-              </div>
-            </div>
+            <div class="overview-list" id="overview-list"></div>
           </div>
         </div>
       </section>
     </main>
   </div>
 
-  <script>
-    const links = document.querySelectorAll('.nav-link');
-    const pages = document.querySelectorAll('.page');
+  <dialog id="edit-dialog" class="dialog">
+    <form method="dialog" class="dialog-card glow-target" id="edit-form">
+      <div class="dialog-head">
+        <div>
+          <span class="section-kicker">Edit</span>
+          <h4>Post bearbeiten</h4>
+        </div>
+        <button class="ghost-btn glow-target" type="button" id="close-dialog">Schließen</button>
+      </div>
+      <input type="hidden" name="id" />
+      <label class="stack-label">Titel
+        <input class="field" name="title" required />
+      </label>
+      <label class="stack-label">Beschreibung
+        <textarea class="field text-area" name="description"></textarea>
+      </label>
+      <div class="input-grid dialog-grid">
+        <label class="stack-label">Kategorie
+          <input class="field" name="category" />
+        </label>
+        <label class="stack-label">Art
+          <input class="field" name="content_type" />
+        </label>
+        <label class="stack-label">Status
+          <select class="field" name="status">
+            <option value="idea">Idee</option>
+            <option value="in_progress">In Arbeit</option>
+            <option value="planned">Geplant</option>
+            <option value="published">Veröffentlicht</option>
+          </select>
+        </label>
+        <label class="stack-label">Datum
+          <input class="field" type="date" name="planned_date" />
+        </label>
+      </div>
+      <label class="stack-label">Kanäle
+        <div class="channel-options">
+          <label><input type="checkbox" name="channels" value="facebook" /> FB</label>
+          <label><input type="checkbox" name="channels" value="instagram" /> IG</label>
+          <label><input type="checkbox" name="channels" value="linkedin" /> LI</label>
+          <label><input type="checkbox" name="channels" value="tiktok" /> TT</label>
+          <label><input type="checkbox" name="channels" value="website" /> WEB</label>
+        </div>
+      </label>
+      <label class="stack-label">Notizen
+        <textarea class="field text-area" name="notes"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary glow-target" type="button" id="delete-post">Löschen</button>
+        <button class="btn btn-primary glow-target" type="submit">Speichern</button>
+      </div>
+    </form>
+  </dialog>
 
-    function activate(pageId) {
-      pages.forEach(page => page.classList.toggle('active', page.id === pageId));
-      links.forEach(link => link.classList.toggle('active', link.dataset.page === pageId));
-    }
+  <dialog id="login-dialog" class="dialog auth-dialog">
+    <form class="dialog-card auth-card brand-login glow-target" id="login-form">
+      <div class="login-brand">
+        <img src="/logo.png" alt="NØRA Logo" class="login-logo" />
+        <div>
+          <span class="section-kicker">NØRA ACCESS</span>
+          <h4>Anmelden</h4>
+          <p class="muted">CONTROL THE CHAOS – aber bitte mit Login.</p>
+        </div>
+      </div>
+      <label class="stack-label">Benutzername
+        <input class="field" name="username" autocomplete="username" required />
+      </label>
+      <label class="stack-label">Passwort
+        <input class="field" type="password" name="password" autocomplete="current-password" required />
+      </label>
+      <div class="dialog-actions">
+        <button class="btn btn-primary glow-target" type="submit">Anmelden</button>
+      </div>
+    </form>
+  </dialog>
 
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        activate(link.dataset.page);
-      });
-    });
-  </script>
+  <dialog id="account-dialog" class="dialog">
+    <div class="dialog-card account-card glow-target">
+      <div class="dialog-head">
+        <div>
+          <span class="section-kicker">Identity</span>
+          <h4>Accountverwaltung</h4>
+        </div>
+        <button class="ghost-btn glow-target" type="button" id="close-account-dialog">Schließen</button>
+      </div>
+      <div class="account-section">
+        <strong>Angemeldet als</strong>
+        <div id="account-summary" class="mini-item"></div>
+      </div>
+
+      <form id="change-password-form" class="account-section">
+        <strong>Passwort ändern</strong>
+        <label class="stack-label">Aktuelles Passwort
+          <input class="field" type="password" name="current_password" required />
+        </label>
+        <label class="stack-label">Neues Passwort
+          <input class="field" type="password" name="new_password" minlength="8" required />
+        </label>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary glow-target" type="button" id="logout-btn">Abmelden</button>
+          <button class="btn btn-primary glow-target" type="submit">Passwort speichern</button>
+        </div>
+      </form>
+
+      <section id="admin-section" class="account-section hidden">
+        <strong>Benutzer anlegen</strong>
+        <form id="create-user-form">
+          <div class="input-grid dialog-grid">
+            <label class="stack-label">Benutzername
+              <input class="field" name="username" required />
+            </label>
+            <label class="stack-label">Rolle
+              <select class="field" name="role">
+                <option value="editor">Editor</option>
+                <option value="admin">Admin</option>
+              </select>
+            </label>
+            <label class="stack-label">Passwort
+              <input class="field" type="password" name="password" minlength="8" required />
+            </label>
+          </div>
+          <div class="dialog-actions">
+            <button class="btn btn-primary glow-target" type="submit">Benutzer erstellen</button>
+          </div>
+        </form>
+
+        <div class="account-section">
+          <strong>Benutzerliste</strong>
+          <div id="user-list" class="mini-list"></div>
+        </div>
+      </section>
+    </div>
+  </dialog>
+
+  <script src="/app.js"></script>
 </body>
 </html>
