@@ -1,0 +1,12 @@
+services:
+  social-media-planner:
+    build: .
+    container_name: social-media-planner
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_PATH: /app/data/planner.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
