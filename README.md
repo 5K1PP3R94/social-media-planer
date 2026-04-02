@@ -1,4 +1,4 @@
-# Social Media Planner
+# NORA Social Media Planner
 
 Selfhosted Social-Media-Planer mit:
 - Ideensammlung
