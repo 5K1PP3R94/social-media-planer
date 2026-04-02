@@ -1,67 +1,64 @@
 # Social Media Planner
 
-Ein selfhosted Social-Media-Planer mit drei Ansichten:
-
-- **Planer** für die eigentliche Arbeit
-- **Ideensammlung** als schneller Eingangskorb
-- **Planübersicht** als kompakte Liste aller geplanten Inhalte
-
-## Stack
-
-- Python 3
+Selfhosted Social-Media-Planer mit:
+- Ideensammlung
+- Planer
+- kompakter Planübersicht
 - SQLite
-- HTML / CSS / Vanilla JS
 - Docker / Docker Compose
+- Benutzerkonten mit Login
+- Admin-Benutzerverwaltung
 
-## Was die App schon kann
-
-- Ideen anlegen
-- Ideen in den Planer übernehmen
-- Geplante Posts wieder zurück in die Ideensammlung schicken
-- Posts bearbeiten
-- Posts löschen
-- Kompakte Planübersicht
-- Persistente Daten per SQLite-Volume
-
-## Lokaler Start ohne Docker
-
-```bash
-python src/server.py
-```
-
-Die App läuft dann auf `http://localhost:3000`.
-
-## Start mit Docker Compose
+## Start
 
 ```bash
 docker compose up -d --build
 ```
 
-Danach läuft die App auf `http://localhost:3000`.
-
-## Projektstruktur
+Danach erreichbar unter:
 
 ```text
-social-media-planner/
-├── data/                # SQLite-Datei wird hier gespeichert
-├── public/              # HTML, CSS, JS
-├── src/
-│   └── server.py        # Webserver, API und Datenbank-Setup
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
+http://SERVER-IP:3001
 ```
 
-## Wichtige API-Endpunkte
+## Standard-Login
 
-- `GET /api/posts` – alle Posts
-- `GET /api/posts/summary` – Kennzahlen
-- `POST /api/posts` – neuen Post anlegen
-- `PUT /api/posts/:id` – Post bearbeiten
-- `POST /api/posts/:id/plan` – Idee in den Planer übernehmen
-- `POST /api/posts/:id/unplan` – Post zurück in die Ideensammlung
-- `DELETE /api/posts/:id` – Post löschen
+Die Standard-Zugangsdaten kommen aus der `docker-compose.yml`:
 
-## Deployment-Hinweis
+- Benutzername: `admin`
+- Passwort: `bitte-sofort-aendern-123`
 
-Wenn du das in dein Git-Repo lädst, solltest du die echte SQLite-Datei **nicht** committen. Die wird zur Laufzeit im `data`-Ordner erzeugt und über das Volume erhalten.
+**Unbedingt direkt ändern.**
+
+## Accountverwaltung
+
+Im Tool gibt es rechts oben den Button **Account**.
+
+Dort kannst du:
+- dein Passwort ändern
+- dich abmelden
+- als Admin neue Benutzer anlegen
+- Benutzer löschen
+- Passwörter zurücksetzen
+
+## Wichtige Umgebungsvariablen
+
+```yaml
+ADMIN_USERNAME: admin
+ADMIN_PASSWORD: bitte-sofort-aendern-123
+SESSION_DAYS: 14
+DB_PATH: /app/data/planner.db
+PORT: 3000
+```
+
+## Daten
+
+Die SQLite-Datenbank liegt im Volume:
+
+```text
+./data -> /app/data
+```
+
+## Hinweis bei bestehender Installation
+
+Wenn bereits eine alte `planner.db` ohne Benutzer-Tabellen existiert, werden die neuen Tabellen beim Start automatisch ergänzt.

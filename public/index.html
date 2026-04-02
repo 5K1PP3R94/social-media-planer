@@ -45,6 +45,8 @@
           <p>Eine moderne Oberfläche mit drei klar getrennten Modi: sammeln, bearbeiten und den kompletten Plan in einem Blick erfassen.</p>
         </div>
         <div class="actions">
+          <div class="account-chip" id="account-chip">Nicht angemeldet</div>
+          <button class="btn btn-secondary" id="account-btn">Account</button>
           <button class="btn btn-secondary" id="refresh-btn">Neu laden</button>
           <button class="btn btn-primary" data-page-jump="ideen">+ Neuer Inhalt</button>
         </div>
@@ -254,6 +256,79 @@
         <button class="btn btn-primary" type="submit">Speichern</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="login-dialog" class="dialog auth-dialog">
+    <form class="dialog-card auth-card" id="login-form">
+      <div class="dialog-head">
+        <h4>Anmelden</h4>
+      </div>
+      <p class="muted">Nur mit Benutzerkonto zugänglich.</p>
+      <label class="stack-label">Benutzername
+        <input class="field" name="username" autocomplete="username" required />
+      </label>
+      <label class="stack-label">Passwort
+        <input class="field" type="password" name="password" autocomplete="current-password" required />
+      </label>
+      <div class="dialog-actions">
+        <button class="btn btn-primary" type="submit">Anmelden</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="account-dialog" class="dialog">
+    <div class="dialog-card account-card">
+      <div class="dialog-head">
+        <h4>Accountverwaltung</h4>
+        <button class="ghost-btn" type="button" id="close-account-dialog">Schließen</button>
+      </div>
+      <div class="account-section">
+        <strong>Angemeldet als</strong>
+        <div id="account-summary" class="mini-item"></div>
+      </div>
+
+      <form id="change-password-form" class="account-section">
+        <strong>Passwort ändern</strong>
+        <label class="stack-label">Aktuelles Passwort
+          <input class="field" type="password" name="current_password" required />
+        </label>
+        <label class="stack-label">Neues Passwort
+          <input class="field" type="password" name="new_password" minlength="8" required />
+        </label>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" type="button" id="logout-btn">Abmelden</button>
+          <button class="btn btn-primary" type="submit">Passwort speichern</button>
+        </div>
+      </form>
+
+      <section id="admin-section" class="account-section hidden">
+        <strong>Benutzer anlegen</strong>
+        <form id="create-user-form">
+          <div class="input-grid dialog-grid">
+            <label class="stack-label">Benutzername
+              <input class="field" name="username" required />
+            </label>
+            <label class="stack-label">Rolle
+              <select class="field" name="role">
+                <option value="editor">Editor</option>
+                <option value="admin">Admin</option>
+              </select>
+            </label>
+            <label class="stack-label">Passwort
+              <input class="field" type="password" name="password" minlength="8" required />
+            </label>
+          </div>
+          <div class="dialog-actions">
+            <button class="btn btn-primary" type="submit">Benutzer erstellen</button>
+          </div>
+        </form>
+
+        <div class="account-section">
+          <strong>Benutzerliste</strong>
+          <div id="user-list" class="mini-list"></div>
+        </div>
+      </section>
+    </div>
   </dialog>
 
   <script src="/app.js"></script>
