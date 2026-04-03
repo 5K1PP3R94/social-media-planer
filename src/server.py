@@ -10,7 +10,7 @@ PORT = int(os.environ.get('PORT', '3001'))
 
 app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
 app.secret_key = SECRET_KEY
-app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax')
+app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax', SESSION_COOKIE_NAME='nora_session')
 
 def db():
     conn = sqlite3.connect(DB_PATH)
