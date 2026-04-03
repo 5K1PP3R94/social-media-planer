@@ -1,1 +1,153 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>NØRA</title><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/styles.css"></head><body><div class="shell"><aside class="sidebar"><div class="brand"><img src="/logo.png" alt="NØRA"><div><h1>NØRA</h1><p>Control your flow.</p></div></div><nav class="nav"><a href="#overview" class="nav-link active" data-page="overview"><span>📋 Übersicht</span><span class="meta">Start</span></a><a href="#planner" class="nav-link" data-page="planner"><span>📅 Planer</span><span class="meta">Planung</span></a><a href="#ideas" class="nav-link" data-page="ideas"><span>💡 Ideensammlung</span><span class="meta">Inbox</span></a></nav><div class="sidebar-card"><strong>NØRA V2</strong><p style="margin-top:8px">Übersicht zuerst. Planer und Ideen bewusst clean gehalten.</p></div></aside><main class="main"><header class="topbar"><div><h2>NØRA Social Planner</h2><p>Eine Oberfläche, drei klare Modi: überblicken, planen, sammeln.</p></div><div class="actions"><span id="user-pill" class="user-pill"></span><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header><section id="overview" class="page active"><section class="panel hero"><div><div class="eyebrow">✨ Übersicht ist jetzt die Startseite</div><h3>Alles Wichtige in einem Blick.</h3><p>Hier leben Kennzahlen, To-dos und die kompakte Planliste. Der Planer und die Ideensammlung bleiben dafür angenehm aufgeräumt.</p></div><div class="stats"><div class="stat"><div class="label">Geplant</div><div class="value" id="stat-planner">0</div><div class="sub">Beiträge im Planer</div></div><div class="stat"><div class="label">Ideenpool</div><div class="value" id="stat-ideas">0</div><div class="sub">offene Ideen</div></div><div class="stat"><div class="label">In Arbeit</div><div class="value" id="stat-work">0</div><div class="sub">mit Druck</div></div><div class="stat"><div class="label">Kanäle</div><div class="value" id="stat-channels">5</div><div class="sub">FB, IG, LI, TT, WEB</div></div></div></section><section class="overview-grid"><div class="panel overview-main"><div class="section-head"><div><h4>Planübersicht</h4><p>Maximal kompakt, damit du möglichst viel auf einmal siehst.</p></div></div><div class="overview-list" id="overview-list"></div></div><div style="display:grid;gap:22px"><div class="panel overview-side"><div class="section-head"><div><h4>To-dos</h4><p>Das bleibt exklusiv auf der Übersicht.</p></div></div><div class="todo-list" id="todo-list"></div></div><div class="panel overview-side"><div class="section-head"><div><h4>Offene Ideen</h4><p>Ein schneller Blick in die Inbox.</p></div></div><div class="todo-list" id="open-ideas-list"></div></div></div></section></section><section id="planner" class="page"><section class="panel planner-main"><div class="section-head"><div><h4>Planer</h4><p>Clean und fokussiert. Hier wird nur geplant und bearbeitet.</p></div><div class="toolbar"><div class="pill">Tabelle</div></div></div><div class="form-grid"><input id="planner-title" class="input" placeholder="Titel"><input id="planner-date" class="input" type="date"><input id="planner-category" class="input" list="categories-list" placeholder="Kategorie anlegen oder wählen"><input id="planner-type" class="input" list="types-list" placeholder="Art anlegen oder wählen"></div><div class="channel-grid" id="planner-channels"></div><textarea id="planner-notes" class="textarea" placeholder="Notizen"></textarea><div class="form-actions"><select id="planner-status" class="select"><option value="idea">Idee</option><option value="work">In Arbeit</option><option value="planned">Geplant</option><option value="published">Veröffentlicht</option></select><button class="btn btn-primary" id="planner-save">Beitrag speichern</button><button class="btn btn-secondary" id="planner-reset">Zurücksetzen</button></div><datalist id="categories-list"></datalist><datalist id="types-list"></datalist><div class="rows" style="margin-top:24px"><div class="row-head"><div>Tag</div><div>Datum</div><div>Content</div><div>Kategorie</div><div>Art</div><div>Kanäle</div><div>Status</div><div>Aktion</div></div><div id="planner-rows"></div></div></section></section><section id="ideas" class="page"><section class="panel ideas-main"><div class="section-head"><div><h4>Ideensammlung</h4><p>Nur Ideen. Ohne Dashboard-Kram, ohne Ablenkung.</p></div></div><div class="form-grid"><input id="idea-title" class="input" placeholder="Idee / Titel"><input id="idea-category" class="input" list="categories-list-2" placeholder="Kategorie anlegen oder wählen"><input id="idea-type" class="input" list="types-list-2" placeholder="Art anlegen oder wählen"><select id="idea-status" class="select"><option value="idea">Idee</option><option value="work">In Arbeit</option><option value="planned">Geplant</option></select></div><div class="channel-grid" id="idea-channels"></div><textarea id="idea-notes" class="textarea" placeholder="Notizen"></textarea><div class="form-actions"><button class="btn btn-primary" id="idea-save">Idee speichern</button><button class="btn btn-secondary" id="idea-reset">Zurücksetzen</button></div><datalist id="categories-list-2"></datalist><datalist id="types-list-2"></datalist><div class="idea-cards" id="idea-cards" style="margin-top:24px"></div></section></section></main></div><script src="/app.js"></script></body></html>
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NØRA</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/logo.png" alt="NØRA">
+        <div><h1>NØRA</h1><p>Control your flow.</p></div>
+      </div>
+      <nav class="nav">
+        <a href="#overview" class="nav-link active" data-page="overview"><span>📋 Übersicht</span><span class="meta">Start</span></a>
+        <a href="#planner" class="nav-link" data-page="planner"><span>📅 Planer</span><span class="meta">Planung</span></a>
+        <a href="#ideas" class="nav-link" data-page="ideas"><span>💡 Ideensammlung</span><span class="meta">Inbox</span></a>
+      </nav>
+      <div class="sidebar-card"><strong>NØRA V2.1</strong><p style="margin-top:8px">Übersicht zuerst. Planer und Ideen clean. Account-Verwaltung jetzt direkt eingebaut.</p></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>NØRA Social Planner</h2>
+          <p>Eine Oberfläche, drei klare Modi: überblicken, planen, sammeln.</p>
+        </div>
+        <div class="actions">
+          <span id="user-pill" class="user-pill"></span>
+          <button class="btn btn-secondary" id="change-password-btn">Passwort ändern</button>
+          <button class="btn btn-secondary admin-only hidden" id="manage-users-btn">Benutzer verwalten</button>
+          <button class="btn btn-secondary" id="logout-btn">Logout</button>
+        </div>
+      </header>
+
+      <section id="overview" class="page active">
+        <section class="panel hero">
+          <div>
+            <div class="eyebrow">✨ Übersicht ist jetzt die Startseite</div>
+            <h3>Alles Wichtige in einem Blick.</h3>
+            <p>Hier leben Kennzahlen, To-dos und die kompakte Planliste. Der Planer und die Ideensammlung bleiben dafür angenehm aufgeräumt.</p>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="label">Geplant</div><div class="value" id="stat-planner">0</div><div class="sub">Beiträge im Planer</div></div>
+            <div class="stat"><div class="label">Ideenpool</div><div class="value" id="stat-ideas">0</div><div class="sub">offene Ideen</div></div>
+            <div class="stat"><div class="label">In Arbeit</div><div class="value" id="stat-work">0</div><div class="sub">mit Druck</div></div>
+            <div class="stat"><div class="label">Kanäle</div><div class="value" id="stat-channels">5</div><div class="sub">FB, IG, LI, TT, WEB</div></div>
+          </div>
+        </section>
+
+        <section class="overview-grid">
+          <div class="panel overview-main">
+            <div class="section-head"><div><h4>Planübersicht</h4><p>Maximal kompakt, damit du möglichst viel auf einmal siehst.</p></div></div>
+            <div class="overview-list" id="overview-list"></div>
+          </div>
+          <div style="display:grid;gap:22px">
+            <div class="panel overview-side">
+              <div class="section-head"><div><h4>To-dos</h4><p>Das bleibt exklusiv auf der Übersicht.</p></div></div>
+              <div class="todo-list" id="todo-list"></div>
+            </div>
+            <div class="panel overview-side">
+              <div class="section-head"><div><h4>Offene Ideen</h4><p>Ein schneller Blick in die Inbox.</p></div></div>
+              <div class="todo-list" id="open-ideas-list"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="planner" class="page">
+        <section class="panel planner-main">
+          <div class="section-head"><div><h4>Planer</h4><p>Clean und fokussiert. Hier wird nur geplant und bearbeitet.</p></div><div class="toolbar"><div class="pill">Tabelle</div></div></div>
+          <div class="viewer-lock hidden" id="planner-viewer-lock">Viewer-Modus: Beiträge können angesehen, aber nicht bearbeitet werden.</div>
+          <div class="form-grid editor-only">
+            <input id="planner-title" class="input" placeholder="Titel">
+            <input id="planner-date" class="input" type="date">
+            <input id="planner-category" class="input" list="categories-list" placeholder="Kategorie anlegen oder wählen">
+            <input id="planner-type" class="input" list="types-list" placeholder="Art anlegen oder wählen">
+          </div>
+          <div class="channel-grid editor-only" id="planner-channels"></div>
+          <textarea id="planner-notes" class="textarea editor-only" placeholder="Notizen"></textarea>
+          <div class="form-actions editor-only">
+            <select id="planner-status" class="select">
+              <option value="idea">Idee</option><option value="work">In Arbeit</option><option value="planned">Geplant</option><option value="published">Veröffentlicht</option>
+            </select>
+            <button class="btn btn-primary" id="planner-save">Beitrag speichern</button>
+            <button class="btn btn-secondary" id="planner-reset">Zurücksetzen</button>
+          </div>
+          <datalist id="categories-list"></datalist><datalist id="types-list"></datalist>
+          <div class="rows" style="margin-top:24px"><div class="row-head"><div>Tag</div><div>Datum</div><div>Content</div><div>Kategorie</div><div>Art</div><div>Kanäle</div><div>Status</div><div>Aktion</div></div><div id="planner-rows"></div></div>
+        </section>
+      </section>
+
+      <section id="ideas" class="page">
+        <section class="panel ideas-main">
+          <div class="section-head"><div><h4>Ideensammlung</h4><p>Nur Ideen. Ohne Dashboard-Kram, ohne Ablenkung.</p></div></div>
+          <div class="viewer-lock hidden" id="ideas-viewer-lock">Viewer-Modus: Ideen können angesehen, aber nicht bearbeitet werden.</div>
+          <div class="form-grid editor-only">
+            <input id="idea-title" class="input" placeholder="Idee / Titel">
+            <input id="idea-category" class="input" list="categories-list-2" placeholder="Kategorie anlegen oder wählen">
+            <input id="idea-type" class="input" list="types-list-2" placeholder="Art anlegen oder wählen">
+            <select id="idea-status" class="select"><option value="idea">Idee</option><option value="work">In Arbeit</option><option value="planned">Geplant</option></select>
+          </div>
+          <div class="channel-grid editor-only" id="idea-channels"></div>
+          <textarea id="idea-notes" class="textarea editor-only" placeholder="Notizen"></textarea>
+          <div class="form-actions editor-only"><button class="btn btn-primary" id="idea-save">Idee speichern</button><button class="btn btn-secondary" id="idea-reset">Zurücksetzen</button></div>
+          <datalist id="categories-list-2"></datalist><datalist id="types-list-2"></datalist>
+          <div class="idea-cards" id="idea-cards" style="margin-top:24px"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="password-modal">
+    <div class="modal-card">
+      <div class="modal-head"><div><h4>Mein Passwort ändern</h4><p>Einmal sauber tauschen, dann ist der Standard-Login Geschichte.</p></div><button class="modal-close" data-close="password-modal">×</button></div>
+      <div class="form-stack">
+        <input id="pw-current" class="input" type="password" placeholder="Aktuelles Passwort">
+        <input id="pw-new" class="input" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)">
+        <input id="pw-new-2" class="input" type="password" placeholder="Neues Passwort wiederholen">
+        <div id="pw-message" class="inline-message"></div>
+        <div class="form-actions"><button class="btn btn-primary" id="pw-save">Passwort speichern</button><button class="btn btn-secondary" data-close="password-modal">Abbrechen</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="users-modal">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-head"><div><h4>Benutzer verwalten</h4><p>Admins anlegen, Rollen vergeben, Passwörter zurücksetzen.</p></div><button class="modal-close" data-close="users-modal">×</button></div>
+      <div class="users-grid">
+        <section class="panel mini-panel">
+          <div class="section-head"><div><h4>Neuen Benutzer anlegen</h4><p>Direkt aus der Oberfläche.</p></div></div>
+          <div class="form-stack">
+            <input id="new-username" class="input" placeholder="Benutzername">
+            <input id="new-password" class="input" type="password" placeholder="Startpasswort (mind. 8 Zeichen)">
+            <select id="new-role" class="select"><option value="editor">Editor</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select>
+            <div id="users-create-message" class="inline-message"></div>
+            <button class="btn btn-primary" id="create-user-btn">Benutzer anlegen</button>
+          </div>
+        </section>
+        <section class="panel mini-panel">
+          <div class="section-head"><div><h4>Bestehende Benutzer</h4><p>Rolle ändern, deaktivieren oder Passwort zurücksetzen.</p></div></div>
+          <div id="users-list" class="users-list"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
