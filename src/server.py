@@ -7,6 +7,9 @@ PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
 DB_PATH = os.environ.get('DB_PATH', os.path.join(BASE_DIR, 'data', 'planner.db'))
 SECRET_KEY = os.environ.get('SECRET_KEY', 'change-me-nora-secret')
 PORT = int(os.environ.get('PORT', '3001'))
+CHANNEL_MAP = {
+    'FB': 'Facebook', 'IG': 'Instagram', 'LI': 'LinkedIn', 'TT': 'TikTok', 'WEB': 'Website'
+}
 
 app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
 app.secret_key = SECRET_KEY
@@ -27,6 +30,31 @@ def hash_pw(password: str, salt: str | None = None):
     salt = salt or secrets.token_hex(16)
     digest = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 200000).hex()
     return salt, digest
+
+
+def normalize_channels(raw):
+    result = []
+    seen = set()
+    for item in raw or []:
+        name = CHANNEL_MAP.get((item or '').strip(), (item or '').strip())
+        if name and name not in seen:
+            seen.add(name)
+            result.append(name)
+    return result
+
+
+def parse_channels(value):
+    try:
+        return normalize_channels(json.loads(value or '[]'))
+    except Exception:
+        return []
+
+
+def ensure_channel(conn, name):
+    name = CHANNEL_MAP.get((name or '').strip(), (name or '').strip())
+    if name:
+        conn.execute('INSERT OR IGNORE INTO channels(name) VALUES (?)', (name,))
+    return name
 
 
 def init_db():
@@ -52,6 +80,10 @@ def init_db():
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT UNIQUE NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS channels (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT UNIQUE NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS posts (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           title TEXT NOT NULL,
@@ -67,7 +99,7 @@ def init_db():
         );
         """
     )
-    # migrations
+
     user_cols = [r['name'] for r in cur.execute('PRAGMA table_info(users)').fetchall()]
     if 'is_active' not in user_cols:
         cur.execute('ALTER TABLE users ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1')
@@ -76,6 +108,8 @@ def init_db():
         cur.execute('INSERT OR IGNORE INTO categories(name) VALUES (?)', (c,))
     for t in ['Reel','Grafik','Foto','Animation','Story']:
         cur.execute('INSERT OR IGNORE INTO content_types(name) VALUES (?)', (t,))
+    for channel in ['Facebook', 'Instagram', 'LinkedIn', 'TikTok', 'Website']:
+        cur.execute('INSERT OR IGNORE INTO channels(name) VALUES (?)', (channel,))
 
     cur.execute('SELECT COUNT(*) AS c FROM users')
     if cur.fetchone()['c'] == 0:
@@ -88,14 +122,23 @@ def init_db():
     cur.execute('SELECT COUNT(*) AS c FROM posts')
     if cur.fetchone()['c'] == 0:
         demo = [
-            ('Ausstellung Detailpost','', '2026-04-13','Allgemein','Reel', json.dumps(['FB','IG','LI']), 'work', 'planner'),
-            ('Ende Winterreifenpflicht','', '2026-04-15','Service','Grafik', json.dumps(['FB','IG','LI']), 'work', 'planner'),
-            ('Morgen geht’s los (Ausstellung)','', '2026-04-17','Allgemein','Reel', json.dumps(['FB','IG','LI']), 'planned', 'planner'),
-            ('Nachbericht Ausstellung','', '2026-04-21','Allgemein','Reel', json.dumps(['FB','IG','LI']), 'work', 'planner'),
-            ('Star Wars Day?','Humorvoller Sci-Fi-Post', None,'Verkauf','Reel', json.dumps(['FB','IG']), 'idea', 'ideas'),
-            ('Urlaubscheck Wischerblätter','Kurzer Service-Hinweis vor Reisebeginn', None,'Service','Reel', json.dumps(['FB','IG']), 'idea', 'ideas'),
+            ('Ausstellung Detailpost','', '2026-04-13','Allgemein','Reel', json.dumps(['Facebook','Instagram','LinkedIn']), 'work', 'planner'),
+            ('Ende Winterreifenpflicht','', '2026-04-15','Service','Grafik', json.dumps(['Facebook','Instagram','LinkedIn']), 'work', 'planner'),
+            ('Morgen geht’s los (Ausstellung)','', '2026-04-17','Allgemein','Reel', json.dumps(['Facebook','Instagram','LinkedIn']), 'planned', 'planner'),
+            ('Nachbericht Ausstellung','', '2026-04-21','Allgemein','Reel', json.dumps(['Facebook','Instagram','LinkedIn']), 'work', 'planner'),
+            ('Star Wars Day?','Humorvoller Sci-Fi-Post', None,'Verkauf','Reel', json.dumps(['Facebook','Instagram']), 'idea', 'ideas'),
+            ('Urlaubscheck Wischerblätter','Kurzer Service-Hinweis vor Reisebeginn', None,'Service','Reel', json.dumps(['Facebook','Instagram']), 'idea', 'ideas'),
         ]
         cur.executemany('INSERT INTO posts(title,notes,planned_date,category,content_type,channels,status,location) VALUES (?,?,?,?,?,?,?,?)', demo)
+
+    # normalize old channel abbreviations in existing posts
+    cur.execute('SELECT id, channels FROM posts')
+    for row in cur.fetchall():
+        normalized = normalize_channels(parse_channels(row['channels']))
+        cur.execute('UPDATE posts SET channels=? WHERE id=?', (json.dumps(normalized), row['id']))
+        for name in normalized:
+            cur.execute('INSERT OR IGNORE INTO channels(name) VALUES (?)', (name,))
+
     conn.commit(); conn.close()
 
 
@@ -130,6 +173,13 @@ def require_admin(fn):
             return jsonify({'error':'forbidden'}), 403
         return fn(*args, **kwargs)
     return wrapper
+
+
+def require_editor_role():
+    user = current_user()
+    if user['role'] == 'viewer':
+        return jsonify({'error': 'Nur lesen'}), 403
+    return None
 
 
 @app.route('/')
@@ -296,8 +346,58 @@ def bootstrap_api():
     categories = [r['name'] for r in cur.fetchall()]
     cur.execute('SELECT name FROM content_types ORDER BY name')
     types = [r['name'] for r in cur.fetchall()]
+    cur.execute('SELECT name FROM channels ORDER BY name')
+    channels = [r['name'] for r in cur.fetchall()]
     conn.close()
-    return jsonify({'categories': categories, 'types': types, 'channels': ['FB','IG','LI','TT','WEB']})
+    return jsonify({'categories': categories, 'types': types, 'channels': channels})
+
+
+@app.get('/api/channels')
+@require_login
+def channels_api():
+    conn = db(); cur = conn.cursor()
+    cur.execute('SELECT name FROM channels ORDER BY name')
+    rows = [r['name'] for r in cur.fetchall()]
+    conn.close()
+    return jsonify(rows)
+
+
+@app.post('/api/channels')
+@require_login
+def create_channel():
+    deny = require_editor_role()
+    if deny:
+        return deny
+    data = request.get_json(force=True)
+    name = CHANNEL_MAP.get(data.get('name', '').strip(), data.get('name', '').strip())
+    if not name:
+        return jsonify({'error': 'Kanalname fehlt'}), 400
+    conn = db()
+    try:
+        conn.execute('INSERT INTO channels(name) VALUES (?)', (name,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({'error': 'Kanal existiert bereits'}), 400
+    conn.close()
+    return jsonify({'ok': True})
+
+
+@app.delete('/api/channels/<path:name>')
+@require_login
+def delete_channel(name):
+    deny = require_editor_role()
+    if deny:
+        return deny
+    decoded = CHANNEL_MAP.get(name.strip(), name.strip())
+    conn = db(); cur = conn.cursor()
+    cur.execute('DELETE FROM channels WHERE name=?', (decoded,))
+    cur.execute('SELECT id, channels FROM posts')
+    for row in cur.fetchall():
+        channels = [x for x in parse_channels(row['channels']) if x != decoded]
+        cur.execute('UPDATE posts SET channels=?, updated_at=CURRENT_TIMESTAMP WHERE id=?', (json.dumps(channels), row['id']))
+    conn.commit(); conn.close()
+    return jsonify({'ok': True})
 
 
 @app.get('/api/posts')
@@ -315,7 +415,7 @@ def posts_api():
     rows = []
     for r in cur.fetchall():
         d = dict(r)
-        d['channels'] = json.loads(d['channels'] or '[]')
+        d['channels'] = parse_channels(d['channels'])
         rows.append(d)
     conn.close()
     return jsonify(rows)
@@ -324,21 +424,24 @@ def posts_api():
 @app.post('/api/posts')
 @require_login
 def create_post():
-    user = current_user()
-    if user['role'] == 'viewer':
-        return jsonify({'error': 'Nur lesen'}), 403
+    deny = require_editor_role()
+    if deny:
+        return deny
     data = request.get_json(force=True)
     title = data.get('title','').strip()
     if not title:
         return jsonify({'error':'Titel fehlt'}), 400
     category = data.get('category','').strip()
     content_type = data.get('content_type','').strip()
+    channels = normalize_channels(data.get('channels', []))
     conn = db(); cur = conn.cursor()
     if category:
         cur.execute('INSERT OR IGNORE INTO categories(name) VALUES (?)', (category,))
     if content_type:
         cur.execute('INSERT OR IGNORE INTO content_types(name) VALUES (?)', (content_type,))
-    payload = (title, data.get('notes','').strip(), data.get('planned_date') or None, category, content_type, json.dumps(data.get('channels', [])), data.get('status','idea'), data.get('location','ideas'))
+    for channel in channels:
+        cur.execute('INSERT OR IGNORE INTO channels(name) VALUES (?)', (channel,))
+    payload = (title, data.get('notes','').strip(), data.get('planned_date') or None, category, content_type, json.dumps(channels), data.get('status','idea'), data.get('location','ideas'))
     cur.execute('INSERT INTO posts(title,notes,planned_date,category,content_type,channels,status,location,updated_at) VALUES (?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)', payload)
     conn.commit(); pid = cur.lastrowid; conn.close()
     return jsonify({'ok': True, 'id': pid})
@@ -347,18 +450,21 @@ def create_post():
 @app.put('/api/posts/<int:pid>')
 @require_login
 def update_post(pid):
-    user = current_user()
-    if user['role'] == 'viewer':
-        return jsonify({'error': 'Nur lesen'}), 403
+    deny = require_editor_role()
+    if deny:
+        return deny
     data = request.get_json(force=True)
     category = data.get('category','').strip()
     content_type = data.get('content_type','').strip()
+    channels = normalize_channels(data.get('channels', []))
     conn = db(); cur = conn.cursor()
     if category:
         cur.execute('INSERT OR IGNORE INTO categories(name) VALUES (?)', (category,))
     if content_type:
         cur.execute('INSERT OR IGNORE INTO content_types(name) VALUES (?)', (content_type,))
-    cur.execute('UPDATE posts SET title=?, notes=?, planned_date=?, category=?, content_type=?, channels=?, status=?, location=?, updated_at=CURRENT_TIMESTAMP WHERE id=?', (data.get('title','').strip(), data.get('notes','').strip(), data.get('planned_date') or None, category, content_type, json.dumps(data.get('channels', [])), data.get('status','idea'), data.get('location','ideas'), pid))
+    for channel in channels:
+        cur.execute('INSERT OR IGNORE INTO channels(name) VALUES (?)', (channel,))
+    cur.execute('UPDATE posts SET title=?, notes=?, planned_date=?, category=?, content_type=?, channels=?, status=?, location=?, updated_at=CURRENT_TIMESTAMP WHERE id=?', (data.get('title','').strip(), data.get('notes','').strip(), data.get('planned_date') or None, category, content_type, json.dumps(channels), data.get('status','idea'), data.get('location','ideas'), pid))
     conn.commit(); conn.close()
     return jsonify({'ok': True})
 
@@ -366,9 +472,9 @@ def update_post(pid):
 @app.delete('/api/posts/<int:pid>')
 @require_login
 def delete_post(pid):
-    user = current_user()
-    if user['role'] == 'viewer':
-        return jsonify({'error': 'Nur lesen'}), 403
+    deny = require_editor_role()
+    if deny:
+        return deny
     conn = db(); conn.execute('DELETE FROM posts WHERE id=?', (pid,)); conn.commit(); conn.close()
     return jsonify({'ok': True})
 
@@ -383,21 +489,38 @@ def summary():
     ideas = cur.fetchone()['c']
     cur.execute("SELECT COUNT(*) AS c FROM posts WHERE status='work'")
     work = cur.fetchone()['c']
+    cur.execute('SELECT name FROM channels ORDER BY name')
+    channel_names = [r['name'] for r in cur.fetchall()]
     cur.execute("SELECT * FROM posts WHERE location='planner' ORDER BY COALESCE(planned_date, '9999-12-31') LIMIT 8")
     upcoming = []
     for r in cur.fetchall():
-        d = dict(r); d['channels']=json.loads(d['channels'] or '[]'); upcoming.append(d)
+        d = dict(r); d['channels']=parse_channels(d['channels']); upcoming.append(d)
     cur.execute("SELECT * FROM posts WHERE location='ideas' ORDER BY id DESC LIMIT 6")
     openideas=[]
     for r in cur.fetchall():
-        d = dict(r); d['channels']=json.loads(d['channels'] or '[]'); openideas.append(d)
+        d = dict(r); d['channels']=parse_channels(d['channels']); openideas.append(d)
+
+    cur.execute("SELECT COUNT(*) AS c FROM posts WHERE location='planner' AND (planned_date IS NULL OR planned_date='')")
+    missing_dates = cur.fetchone()['c']
+    cur.execute("SELECT COUNT(*) AS c FROM posts WHERE location='planner' AND (notes IS NULL OR TRIM(notes)='')")
+    missing_notes = cur.fetchone()['c']
+    cur.execute("SELECT COUNT(*) AS c FROM posts WHERE location='planner' AND status='work'")
+    work_items = cur.fetchone()['c']
+    cur.execute("SELECT title, planned_date FROM posts WHERE location='planner' AND planned_date IS NOT NULL AND DATE(planned_date) <= DATE('now', '+3 day') ORDER BY planned_date LIMIT 1")
+    next_due = cur.fetchone()
     conn.close()
-    todos = [
-      {'text':'2 Beiträge brauchen noch eine Caption', 'kind':'work'},
-      {'text':'1 geplanter Post hat noch kein Datum', 'kind':'idea'},
-      {'text':'Muttertag-Idee bis nächste Woche entscheiden', 'kind':'planned'}
-    ]
-    return jsonify({'stats': {'planner': planner, 'ideas': ideas, 'work': work, 'channels': 5}, 'upcoming': upcoming, 'openIdeas': openideas, 'todos': todos})
+
+    todos = []
+    if work_items:
+        todos.append({'text': f'{work_items} Beitrag/Beiträge sind noch in Arbeit', 'detail': 'Diese Posts brauchen noch Liebe, Pixel oder eine Caption.', 'kind':'work'})
+    if missing_dates:
+        todos.append({'text': f'{missing_dates} geplanter Beitrag/Beiträge haben noch kein Datum', 'detail': 'Ohne Datum ist der Kalender eher Deko.', 'kind':'idea'})
+    if missing_notes:
+        todos.append({'text': f'{missing_notes} geplanter Beitrag/Beiträge haben noch keine Notizen', 'detail': 'Kann später beim Produzieren unnötig weh tun.', 'kind':'idea'})
+    if next_due:
+        todos.append({'text': f'Nächster fälliger Post: {next_due["title"]}', 'detail': f'Geplant für {next_due["planned_date"]}', 'kind':'planned'})
+
+    return jsonify({'stats': {'planner': planner, 'ideas': ideas, 'work': work, 'channels': len(channel_names), 'channel_names': channel_names[:4]}, 'upcoming': upcoming, 'openIdeas': openideas, 'todos': todos})
 
 
 if __name__ == '__main__':
