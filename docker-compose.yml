@@ -8,6 +8,13 @@ services:
       PORT: 3000
       DB_PATH: /app/data/planner.db
       SECRET_KEY: change-this-in-portainer
+      COOKIE_SECURE: "false"
     volumes:
       - ./data:/app/data
+    networks:
+      - npm_default
     restart: unless-stopped
+
+networks:
+  npm_default:
+    external: true

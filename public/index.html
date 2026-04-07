@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
   <div class="shell">
     <aside class="sidebar">
       <div class="brand">
@@ -23,6 +27,12 @@
     </aside>
 
     <main class="main">
+
+      <!-- Default password warning banner -->
+      <div id="default-pw-banner" class="default-pw-banner hidden">
+        ⚠️ Du verwendest noch das Standard-Passwort. Bitte <button id="default-pw-banner-btn" class="link-btn">jetzt ändern</button> – das sollte nicht warten.
+      </div>
+
       <header class="topbar">
         <div>
           <h2>NØRA Social Planner</h2>
@@ -118,7 +128,7 @@
                 <button class="icon-btn" id="calendar-prev">←</button>
                 <div>
                   <h5 id="calendar-title">Kalender</h5>
-                  <p>Alle geplanten Beiträge im Monatsblick.</p>
+                  <p>Alle geplanten Beiträge im Monatsblick. Verschieben per Drag &amp; Drop.</p>
                 </div>
                 <button class="icon-btn" id="calendar-next">→</button>
               </div>
@@ -129,7 +139,10 @@
             </div>
           </div>
 
-          <div class="rows" style="margin-top:24px"><div class="row-head"><div>Tag</div><div>Datum</div><div>Content</div><div>Kategorie</div><div>Art</div><div>Kanäle</div><div>Status</div><div>Aktion</div></div><div id="planner-rows"></div></div>
+          <div class="rows" style="margin-top:24px">
+            <div class="row-head"><div>Tag</div><div>Datum</div><div>Content</div><div>Kategorie</div><div>Art</div><div>Kanäle</div><div>Status</div><div>Aktion</div></div>
+            <div id="planner-rows"></div>
+          </div>
         </section>
       </section>
 
@@ -154,36 +167,54 @@
           </div>
           <div class="channel-grid editor-only" id="idea-channels"></div>
           <textarea id="idea-notes" class="textarea editor-only" placeholder="Notizen"></textarea>
-          <div class="form-actions editor-only"><button class="btn btn-primary" id="idea-save">Idee speichern</button><button class="btn btn-secondary" id="idea-reset">Zurücksetzen</button></div>
+          <div class="form-actions editor-only">
+            <button class="btn btn-primary" id="idea-save">Idee speichern</button>
+            <button class="btn btn-secondary" id="idea-reset">Zurücksetzen</button>
+          </div>
           <div class="idea-cards" id="idea-cards" style="margin-top:24px"></div>
         </section>
       </section>
     </main>
   </div>
 
+  <!-- ── Passwort ändern Modal ──────────────────────────────────────────── -->
   <div class="modal-backdrop hidden" id="password-modal">
     <div class="modal-card">
-      <div class="modal-head"><div><h4>Mein Passwort ändern</h4><p>Einmal sauber tauschen, dann ist der Standard-Login Geschichte.</p></div><button class="modal-close" data-close="password-modal">×</button></div>
+      <div class="modal-head">
+        <div><h4>Mein Passwort ändern</h4><p>Einmal sauber tauschen, dann ist der Standard-Login Geschichte.</p></div>
+        <button class="modal-close" data-close="password-modal">×</button>
+      </div>
       <div class="form-stack">
-        <input id="pw-current" class="input" type="password" placeholder="Aktuelles Passwort">
-        <input id="pw-new" class="input" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)">
-        <input id="pw-new-2" class="input" type="password" placeholder="Neues Passwort wiederholen">
+        <input id="pw-current" class="input" type="password" placeholder="Aktuelles Passwort" autocomplete="current-password">
+        <input id="pw-new" class="input" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)" autocomplete="new-password">
+        <input id="pw-new-2" class="input" type="password" placeholder="Neues Passwort wiederholen" autocomplete="new-password">
         <div id="pw-message" class="inline-message"></div>
-        <div class="form-actions"><button class="btn btn-primary" id="pw-save">Passwort speichern</button><button class="btn btn-secondary" data-close="password-modal">Abbrechen</button></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="pw-save">Passwort speichern</button>
+          <button class="btn btn-secondary" data-close="password-modal">Abbrechen</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- ── Benutzer verwalten Modal ───────────────────────────────────────── -->
   <div class="modal-backdrop hidden" id="users-modal">
     <div class="modal-card modal-card-wide">
-      <div class="modal-head"><div><h4>Benutzer verwalten</h4><p>Admins anlegen, Rollen vergeben, Passwörter zurücksetzen.</p></div><button class="modal-close" data-close="users-modal">×</button></div>
+      <div class="modal-head">
+        <div><h4>Benutzer verwalten</h4><p>Admins anlegen, Rollen vergeben, Passwörter zurücksetzen.</p></div>
+        <button class="modal-close" data-close="users-modal">×</button>
+      </div>
       <div class="users-grid">
         <section class="panel mini-panel">
           <div class="section-head"><div><h4>Neuen Benutzer anlegen</h4><p>Direkt aus der Oberfläche.</p></div></div>
           <div class="form-stack">
-            <input id="new-username" class="input" placeholder="Benutzername">
-            <input id="new-password" class="input" type="password" placeholder="Startpasswort (mind. 8 Zeichen)">
-            <select id="new-role" class="select"><option value="editor">Editor</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select>
+            <input id="new-username" class="input" placeholder="Benutzername" autocomplete="off">
+            <input id="new-password" class="input" type="password" placeholder="Startpasswort (mind. 8 Zeichen)" autocomplete="new-password">
+            <select id="new-role" class="select">
+              <option value="editor">Editor</option>
+              <option value="viewer">Viewer</option>
+              <option value="admin">Admin</option>
+            </select>
             <div id="users-create-message" class="inline-message"></div>
             <button class="btn btn-primary" id="create-user-btn">Benutzer anlegen</button>
           </div>
@@ -192,6 +223,40 @@
           <div class="section-head"><div><h4>Bestehende Benutzer</h4><p>Rolle ändern, deaktivieren oder Passwort zurücksetzen.</p></div></div>
           <div id="users-list" class="users-list"></div>
         </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Passwort-Reset Modal (Admin) ──────────────────────────────────── -->
+  <div class="modal-backdrop hidden" id="reset-pw-modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div><h4>Passwort zurücksetzen</h4><p>Neues Passwort für <strong id="reset-pw-username"></strong> setzen.</p></div>
+        <button class="modal-close" data-close="reset-pw-modal">×</button>
+      </div>
+      <div class="form-stack">
+        <input id="reset-pw-new" class="input" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)" autocomplete="new-password">
+        <input id="reset-pw-new-2" class="input" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
+        <div id="reset-pw-message" class="inline-message"></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="reset-pw-save">Passwort setzen</button>
+          <button class="btn btn-secondary" data-close="reset-pw-modal">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bestätigungs-Modal (ersetzt browser confirm/alert) ────────────── -->
+  <div class="modal-backdrop hidden" id="confirm-modal">
+    <div class="modal-card modal-card-narrow">
+      <div class="modal-head">
+        <div><h4>Bist du sicher?</h4></div>
+        <button class="modal-close" data-close="confirm-modal">×</button>
+      </div>
+      <p id="confirm-message" class="confirm-msg"></p>
+      <div class="form-actions">
+        <button class="btn btn-danger" id="confirm-ok">Ja, löschen</button>
+        <button class="btn btn-secondary" id="confirm-cancel">Abbrechen</button>
       </div>
     </div>
   </div>
