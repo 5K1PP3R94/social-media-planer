@@ -8,8 +8,6 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-
-  <!-- Toast container -->
   <div id="toast-container" class="toast-container"></div>
 
   <div class="shell">
@@ -23,14 +21,12 @@
         <a href="#planner" class="nav-link" data-page="planner"><span>📅 Planer</span><span class="meta">Planung</span></a>
         <a href="#ideas" class="nav-link" data-page="ideas"><span>💡 Ideensammlung</span><span class="meta">Inbox</span></a>
       </nav>
-      <div class="sidebar-card"><strong>NØRA V4</strong><p style="margin-top:8px">Mit Kalenderansicht, dynamischen To-dos und frei verwaltbaren Kanälen. Das Chaos wird langsam nervös.</p></div>
+      <div class="sidebar-card"><strong>NØRA V5</strong><p style="margin-top:8px">Polished UI, bessere Filter, smartere To-dos, flexiblere Kanalverwaltung. Das Chaos hat inzwischen Puls.</p></div>
     </aside>
 
     <main class="main">
-
-      <!-- Default password warning banner -->
       <div id="default-pw-banner" class="default-pw-banner hidden">
-        ⚠️ Du verwendest noch das Standard-Passwort. Bitte <button id="default-pw-banner-btn" class="link-btn">jetzt ändern</button> – das sollte nicht warten.
+        ⚠️ Du verwendest noch das Standard-Passwort. Bitte <button id="default-pw-banner-btn" class="link-btn">jetzt ändern</button> – sonst gewinnt wieder das Chaos.
       </div>
 
       <header class="topbar">
@@ -51,12 +47,12 @@
           <div>
             <div class="eyebrow">✨ Command Center</div>
             <h3>Alles Wichtige in einem Blick.</h3>
-            <p>Hier leben Kennzahlen, To-dos und die kompakte Planliste. Der Planer und die Ideensammlung bleiben dafür angenehm aufgeräumt.</p>
+            <p>Mit smarteren Prioritäten, besseren To-dos und einer Übersicht, die nicht nur hübsch aussieht, sondern wirklich hilft.</p>
           </div>
           <div class="stats">
             <div class="stat"><div class="label">Geplant</div><div class="value" id="stat-planner">0</div><div class="sub">Beiträge im Planer</div></div>
             <div class="stat"><div class="label">Ideenpool</div><div class="value" id="stat-ideas">0</div><div class="sub">offene Ideen</div></div>
-            <div class="stat"><div class="label">In Arbeit</div><div class="value" id="stat-work">0</div><div class="sub">mit Druck</div></div>
+            <div class="stat"><div class="label">In Arbeit</div><div class="value" id="stat-work">0</div><div class="sub">braucht noch Liebe</div></div>
             <div class="stat"><div class="label">Kanäle</div><div class="value" id="stat-channels">0</div><div class="sub" id="stat-channel-names">–</div></div>
           </div>
         </section>
@@ -68,7 +64,7 @@
           </div>
           <div style="display:grid;gap:22px">
             <div class="panel overview-side">
-              <div class="section-head"><div><h4>To-dos</h4><p>Jetzt dynamisch aus deinen echten Daten erzeugt.</p></div></div>
+              <div class="section-head"><div><h4>To-dos</h4><p>Dynamisch, priorisiert und endlich nicht mehr wie Murmeltier-Tag.</p></div></div>
               <div class="todo-list" id="todo-list"></div>
             </div>
             <div class="panel overview-side">
@@ -81,7 +77,7 @@
 
       <section id="planner" class="page">
         <section class="panel planner-main">
-          <div class="section-head"><div><h4>Planer</h4><p>Clean und fokussiert. Hier wird geplant, bearbeitet und im Kalender kontrolliert.</p></div><div class="toolbar"><div class="pill">Tabelle + Kalender</div></div></div>
+          <div class="section-head"><div><h4>Planer</h4><p>Mehr Kontrolle, bessere Filter und Kalender mit Monats- oder Wochenblick.</p></div><div class="toolbar"><div class="pill">Tabelle + Kalender</div></div></div>
           <div class="viewer-lock hidden" id="planner-viewer-lock">Viewer-Modus: Beiträge können angesehen, aber nicht bearbeitet werden.</div>
 
           <div class="planner-layout">
@@ -101,8 +97,10 @@
 
               <div class="channels-wrap editor-only">
                 <div class="channels-head">
-                  <strong>Kanäle</strong>
-                  <span class="small">Frei anlegbar und wieder löschbar</span>
+                  <div>
+                    <strong>Kanäle</strong>
+                    <div class="small">Frei anlegbar, umbenennbar und löschbar</div>
+                  </div>
                 </div>
                 <div class="channel-grid" id="planner-channels"></div>
                 <div class="channel-manager">
@@ -128,15 +126,34 @@
                 <button class="icon-btn" id="calendar-prev">←</button>
                 <div>
                   <h5 id="calendar-title">Kalender</h5>
-                  <p>Alle geplanten Beiträge im Monatsblick. Verschieben per Drag &amp; Drop.</p>
+                  <p>Ideen hineinziehen, Beiträge verschieben, Chaos domestizieren.</p>
                 </div>
-                <button class="icon-btn" id="calendar-next">→</button>
+                <div class="calendar-head-actions">
+                  <div class="segmented">
+                    <button type="button" class="seg-btn active" id="calendar-mode-month">Monat</button>
+                    <button type="button" class="seg-btn" id="calendar-mode-week">Woche</button>
+                  </div>
+                  <button class="icon-btn" id="calendar-next">→</button>
+                </div>
               </div>
               <div class="calendar-weekdays">
                 <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
               </div>
               <div class="calendar-grid" id="calendar-grid"></div>
             </div>
+          </div>
+
+          <div class="planner-filters">
+            <input id="planner-search" class="input" placeholder="Beiträge durchsuchen…">
+            <div class="combo" data-combo="planner-filter-channel-combo">
+              <input id="planner-filter-channel" class="input combo-input" placeholder="Alle Kanäle" autocomplete="off" readonly>
+              <div class="combo-menu hidden" id="planner-filter-channel-menu"></div>
+            </div>
+            <div class="combo" data-combo="planner-filter-status-combo">
+              <input id="planner-filter-status" class="input combo-input" placeholder="Alle Status" autocomplete="off" readonly>
+              <div class="combo-menu hidden" id="planner-filter-status-menu"></div>
+            </div>
+            <button class="btn btn-secondary" id="planner-clear-filters">Filter zurücksetzen</button>
           </div>
 
           <div class="rows" style="margin-top:24px">
@@ -148,7 +165,7 @@
 
       <section id="ideas" class="page">
         <section class="panel ideas-main">
-          <div class="section-head"><div><h4>Ideensammlung</h4><p>Nur Ideen. Ohne Dashboard-Kram, ohne Ablenkung.</p></div></div>
+          <div class="section-head"><div><h4>Ideensammlung</h4><p>Mit Suche, damit gute Ideen nicht zwischen den Pixeln verloren gehen.</p></div></div>
           <div class="viewer-lock hidden" id="ideas-viewer-lock">Viewer-Modus: Ideen können angesehen, aber nicht bearbeitet werden.</div>
           <div class="form-grid editor-only">
             <input id="idea-title" class="input" placeholder="Idee / Titel">
@@ -171,50 +188,38 @@
             <button class="btn btn-primary" id="idea-save">Idee speichern</button>
             <button class="btn btn-secondary" id="idea-reset">Zurücksetzen</button>
           </div>
+          <div class="ideas-toolbar">
+            <input id="idea-search" class="input" placeholder="Ideen durchsuchen…">
+          </div>
           <div class="idea-cards" id="idea-cards" style="margin-top:24px"></div>
         </section>
       </section>
     </main>
   </div>
 
-  <!-- ── Passwort ändern Modal ──────────────────────────────────────────── -->
   <div class="modal-backdrop hidden" id="password-modal">
     <div class="modal-card">
-      <div class="modal-head">
-        <div><h4>Mein Passwort ändern</h4><p>Einmal sauber tauschen, dann ist der Standard-Login Geschichte.</p></div>
-        <button class="modal-close" data-close="password-modal">×</button>
-      </div>
+      <div class="modal-head"><div><h4>Mein Passwort ändern</h4><p>Einmal sauber tauschen, dann ist der Standard-Login Geschichte.</p></div><button class="modal-close" data-close="password-modal">×</button></div>
       <div class="form-stack">
         <input id="pw-current" class="input" type="password" placeholder="Aktuelles Passwort" autocomplete="current-password">
         <input id="pw-new" class="input" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)" autocomplete="new-password">
         <input id="pw-new-2" class="input" type="password" placeholder="Neues Passwort wiederholen" autocomplete="new-password">
         <div id="pw-message" class="inline-message"></div>
-        <div class="form-actions">
-          <button class="btn btn-primary" id="pw-save">Passwort speichern</button>
-          <button class="btn btn-secondary" data-close="password-modal">Abbrechen</button>
-        </div>
+        <div class="form-actions"><button class="btn btn-primary" id="pw-save">Passwort speichern</button><button class="btn btn-secondary" data-close="password-modal">Abbrechen</button></div>
       </div>
     </div>
   </div>
 
-  <!-- ── Benutzer verwalten Modal ───────────────────────────────────────── -->
   <div class="modal-backdrop hidden" id="users-modal">
     <div class="modal-card modal-card-wide">
-      <div class="modal-head">
-        <div><h4>Benutzer verwalten</h4><p>Admins anlegen, Rollen vergeben, Passwörter zurücksetzen.</p></div>
-        <button class="modal-close" data-close="users-modal">×</button>
-      </div>
+      <div class="modal-head"><div><h4>Benutzer verwalten</h4><p>Admins anlegen, Rollen vergeben, Passwörter zurücksetzen.</p></div><button class="modal-close" data-close="users-modal">×</button></div>
       <div class="users-grid">
         <section class="panel mini-panel">
           <div class="section-head"><div><h4>Neuen Benutzer anlegen</h4><p>Direkt aus der Oberfläche.</p></div></div>
           <div class="form-stack">
             <input id="new-username" class="input" placeholder="Benutzername" autocomplete="off">
             <input id="new-password" class="input" type="password" placeholder="Startpasswort (mind. 8 Zeichen)" autocomplete="new-password">
-            <select id="new-role" class="select">
-              <option value="editor">Editor</option>
-              <option value="viewer">Viewer</option>
-              <option value="admin">Admin</option>
-            </select>
+            <select id="new-role" class="select"><option value="editor">Editor</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select>
             <div id="users-create-message" class="inline-message"></div>
             <button class="btn btn-primary" id="create-user-btn">Benutzer anlegen</button>
           </div>
@@ -227,36 +232,34 @@
     </div>
   </div>
 
-  <!-- ── Passwort-Reset Modal (Admin) ──────────────────────────────────── -->
   <div class="modal-backdrop hidden" id="reset-pw-modal">
     <div class="modal-card">
-      <div class="modal-head">
-        <div><h4>Passwort zurücksetzen</h4><p>Neues Passwort für <strong id="reset-pw-username"></strong> setzen.</p></div>
-        <button class="modal-close" data-close="reset-pw-modal">×</button>
-      </div>
+      <div class="modal-head"><div><h4>Passwort zurücksetzen</h4><p>Neues Passwort für <strong id="reset-pw-username"></strong> setzen.</p></div><button class="modal-close" data-close="reset-pw-modal">×</button></div>
       <div class="form-stack">
         <input id="reset-pw-new" class="input" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)" autocomplete="new-password">
         <input id="reset-pw-new-2" class="input" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
         <div id="reset-pw-message" class="inline-message"></div>
-        <div class="form-actions">
-          <button class="btn btn-primary" id="reset-pw-save">Passwort setzen</button>
-          <button class="btn btn-secondary" data-close="reset-pw-modal">Abbrechen</button>
-        </div>
+        <div class="form-actions"><button class="btn btn-primary" id="reset-pw-save">Passwort setzen</button><button class="btn btn-secondary" data-close="reset-pw-modal">Abbrechen</button></div>
       </div>
     </div>
   </div>
 
-  <!-- ── Bestätigungs-Modal (ersetzt browser confirm/alert) ────────────── -->
   <div class="modal-backdrop hidden" id="confirm-modal">
     <div class="modal-card modal-card-narrow">
-      <div class="modal-head">
-        <div><h4>Bist du sicher?</h4></div>
-        <button class="modal-close" data-close="confirm-modal">×</button>
-      </div>
+      <div class="modal-head"><div><h4>Bist du sicher?</h4></div><button class="modal-close" data-close="confirm-modal">×</button></div>
       <p id="confirm-message" class="confirm-msg"></p>
-      <div class="form-actions">
-        <button class="btn btn-danger" id="confirm-ok">Ja, löschen</button>
-        <button class="btn btn-secondary" id="confirm-cancel">Abbrechen</button>
+      <div class="form-actions"><button class="btn btn-danger" id="confirm-ok">Ja, löschen</button><button class="btn btn-secondary" id="confirm-cancel">Abbrechen</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="rename-channel-modal">
+    <div class="modal-card modal-card-narrow">
+      <div class="modal-head"><div><h4>Kanal umbenennen</h4><p>Gib dem Ding einen besseren Namen.</p></div><button class="modal-close" data-close="rename-channel-modal">×</button></div>
+      <div class="form-stack">
+        <div class="small">Aktuell: <strong id="rename-channel-old"></strong></div>
+        <input id="rename-channel-new" class="input" placeholder="Neuer Kanalname">
+        <div id="rename-channel-message" class="inline-message"></div>
+        <div class="form-actions"><button class="btn btn-primary" id="rename-channel-save">Umbenennen</button><button class="btn btn-secondary" data-close="rename-channel-modal">Abbrechen</button></div>
       </div>
     </div>
   </div>

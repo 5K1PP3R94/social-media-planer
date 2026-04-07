@@ -3,18 +3,11 @@ services:
     build: .
     container_name: nora-social-planner
     ports:
-      - "3005:3000"
+      - "3001:3001"
     environment:
-      PORT: 3000
+      PORT: 3001
       DB_PATH: /app/data/planner.db
       SECRET_KEY: change-this-in-portainer
-      COOKIE_SECURE: "false"
     volumes:
       - ./data:/app/data
-    networks:
-      - npm_default
     restart: unless-stopped
-
-networks:
-  npm_default:
-    external: true
